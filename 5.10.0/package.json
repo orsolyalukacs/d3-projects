@@ -1,0 +1,24 @@
+{
+  "name": "5.10.0",
+  "version": "1.0.0",
+  "description": "A gapminder scatterplot visualization.",
+  "main": "main.js",
+  "scripts": {
+    "build": "babel src -d lib",
+    "start": "webpack-dev-server"
+  },
+  "author": "orchie",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.5",
+    "babel-cli": "^6.26.0",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.10.3"
+  },
+  "dependencies": {
+    "babel-loader": "^8.1.0",
+    "html-webpack-plugin": "^4.2.0"
+  }
+}

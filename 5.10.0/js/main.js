@@ -183,18 +183,6 @@ if (!document.getElementsByTagName('svg').length) {
 			});
 
 			countriesByYear = getCountryData;
-
-			// // Index for each animation
-			// var index = 0;
-
-			// var interval = d3.interval(() => {
-			// 	// Restart animation at the end of loop
-			// 	index = (index < 214) ? index + 1 : 0
-			// 	update(countriesByYear, index);
-			// }, 100);
-
-			// // Run the vis for the first time
-			// update(countriesByYear, index);
 		})
 		// Catch if data is not loaded
 		.catch((error) => {

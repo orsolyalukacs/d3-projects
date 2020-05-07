@@ -22,9 +22,11 @@ if (!document.getElementsByTagName('svg').length) {
 		.append('g')
 		.attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
 
+	var time = 0;
+
 	// Tooltip
 	var tip = d3.tip().attr('class', 'd3-tip')
-		.html((d)=> {
+		.html((d) => {
 			var tooltipText = "<strong>Country:</strong> <span style='color:#c6f25e'>" + d.country + "</span></br>";
 			tooltipText += "<strong>Continent:</strong> <span style='color:#c6f25e; text-transform: capitalize'>" + d.continent + "</span></br>";
 			tooltipText += "<strong>Life Expectancy:</strong> <span style='color:#c6f25e'>" + d3.format('.2f')(d.life_exp) + "</span></br>";
@@ -74,9 +76,53 @@ if (!document.getElementsByTagName('svg').length) {
 		.attr('transform', 'rotate(-90)')
 		.text('years')
 
+	// x and y scale
+	const x = d3
+		.scaleLog()
+		.domain([300, 150000])
+		.range([0, width])
+
+	const y = d3
+		.scaleLinear()
+		.domain([0, 90])
+		.range([height, 0])
+
 	// Color scale
 	var colorScheme = ['#75eab6', '#feafda', '#c6f25e', '#91cef4'];
 	var colorScale = d3.scaleOrdinal().range(colorScheme);
+
+	// Define x and y axis
+	const xAxis = g
+		.append('g')
+		.attr('class', 'x axis')
+		.attr('fill', '#274c56')
+		.attr('transform', 'translate(0, ' + height + ')');
+
+	const yAxis = g
+		.append('g')
+		.attr('class', 'y axis')
+		.attr('fill', '#274c56')
+
+	const xAxisCall = d3.axisBottom(x)
+		.tickValues([400, 4000, 40000])
+		.tickFormat(function (d) {
+			return d;
+		});
+
+	xAxis.call(xAxisCall)
+		.selectAll('text')
+		.attr('y', '10')
+		.attr('x', '-5')
+		.attr('text-anchor', 'end')
+		.attr('transform', 'rotate(-40)');
+
+	const yAxisCall = d3.axisLeft(y)
+		.ticks(9)
+		.tickFormat((d) => {
+			return d;
+		});
+
+	yAxis.call(yAxisCall);
 
 	let continents = ['europe', 'africa', 'americas', 'asia'];
 
@@ -101,7 +147,6 @@ if (!document.getElementsByTagName('svg').length) {
 			.attr('font-size', '14px')
 			.text(continent)
 	})
-
 
 	d3.json('data/data.json')
 		.then((data) => {
@@ -137,30 +182,14 @@ if (!document.getElementsByTagName('svg').length) {
 
 			countriesByYear = getCountryData;
 
-			// Count index for each animation
-			var indexAnim = -1;
-			incrementIndex = () => {
-				indexAnim++;
-				return indexAnim;
-			}
-
-			var index = incrementIndex();
+			// Index for each animation
+			var index = 0;
 
 			var interval = d3.interval(() => {
-				index = incrementIndex();
-				let country = countriesByYear[index];
-				let years = +country.years;
-
-				update(countriesByYear, index)
-
-				if (years === 2014) {
-					interval.stop();
-					return;
-				}
-				else if (years > 2014) {
-					interval.start();
-				}
-			}, 150);
+				// Restart animation at the end of loop
+				index = (index < 214) ? index + 1 : 0
+				update(countriesByYear, index);
+			}, 100);
 
 			// Run the vis for the first time
 			update(countriesByYear, index);
@@ -169,49 +198,6 @@ if (!document.getElementsByTagName('svg').length) {
 		.catch((error) => {
 			console.log(error);
 		});
-
-	// Define x and y axis
-	const x = d3
-		.scaleLog()
-		.domain([300, 150000])
-		.range([0, width])
-
-	const y = d3
-		.scaleLinear()
-		.domain([0, 90])
-		.range([height, 0])
-
-	const xAxis = g
-		.append('g')
-		.attr('class', 'x axis')
-		.attr('fill', '#274c56')
-		.attr('transform', 'translate(0, ' + height + ')');
-
-	const yAxis = g
-		.append('g')
-		.attr('class', 'y axis')
-		.attr('fill', '#274c56')
-
-	const xAxisCall = d3.axisBottom(x)
-		.tickValues([400, 4000, 40000])
-		.tickFormat(function (d) {
-			return d;
-		});
-
-	xAxis.call(xAxisCall)
-		.selectAll('text')
-		.attr('y', '10')
-		.attr('x', '-5')
-		.attr('text-anchor', 'end')
-		.attr('transform', 'rotate(-40)');
-
-	const yAxisCall = d3.axisLeft(y)
-		.ticks(9)
-		.tickFormat((d) => {
-			return d;
-		});
-
-	yAxis.call(yAxisCall);
 
 	// Update pattern
 	update = (countriesByYear, index) => {
@@ -281,15 +267,15 @@ if (!document.getElementsByTagName('svg').length) {
 			// Update circles with incoming data
 			.merge(circles)
 			.transition(t)
-				.attr('cx', (d) => {
-					return x(d.income);
-				})
-				.attr('cy', (d) => {
-					return y(d.life_exp);
-				})
-				.attr('r', (d) => {
-					return rScale(d.population);
-				})
+			.attr('cx', (d) => {
+				return x(d.income);
+			})
+			.attr('cy', (d) => {
+				return y(d.life_exp);
+			})
+			.attr('r', (d) => {
+				return rScale(d.population);
+			})
 	}
 }
 

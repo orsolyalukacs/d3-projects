@@ -22,6 +22,18 @@ if (!document.getElementsByTagName('svg').length) {
 		.append('g')
 		.attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
 
+	// Tooltip
+	var tip = d3.tip().attr('class', 'd3-tip')
+		.html((d)=> {
+			var tooltipText = "<strong>Country:</strong> <span style='color:#c6f25e'>" + d.country + "</span></br>";
+			tooltipText += "<strong>Continent:</strong> <span style='color:#c6f25e; text-transform: capitalize'>" + d.continent + "</span></br>";
+			tooltipText += "<strong>Life Expectancy:</strong> <span style='color:#c6f25e'>" + d3.format('.2f')(d.life_exp) + "</span></br>";
+			tooltipText += "<strong>GDP/capita:</strong> <span style='color:#c6f25e'>" + d3.format('$,.0f')(d.income) + "</span></br>";
+			tooltipText += "<strong>Population:</strong> <span style='color:#c6f25e'>" + d3.format(',.0f')(d.population) + "</span></br>";
+			return tooltipText;
+		});
+	g.call(tip);
+
 	// X Labels
 	g.append('text')
 		.attr('class', 'x axis-label')
@@ -257,19 +269,6 @@ if (!document.getElementsByTagName('svg').length) {
 		// Exit old elements from previous year in data
 		circles.exit().remove();
 
-		// Update circles with incoming data of each year
-		circles
-			.transition(t)
-			.attr('r', (d) => {
-				return rScale(d.population)
-			})
-			.attr('cx', (d) => {
-				return x(d.income);
-			})
-			.attr('cy', (d) => {
-				return y(d.life_exp);
-			})
-
 		// Append circles for each country in first year
 		circles
 			.enter()
@@ -277,15 +276,20 @@ if (!document.getElementsByTagName('svg').length) {
 			.style('fill', (d) => { return colorScale(d.continent); })
 			.attr('stroke', '#000')
 			.attr('stroke-width', 0.7)
-			.attr('cx', (d) => {
-				return x(d.income);
-			})
-			.attr('cy', (d) => {
-				return y(d.life_exp);
-			})
-			.attr('r', (d) => {
-				return rScale(d.population);
-			})
+			.on('mouseover', tip.show)
+			.on('mouseout', tip.hide)
+			// Update circles with incoming data
+			.merge(circles)
+			.transition(t)
+				.attr('cx', (d) => {
+					return x(d.income);
+				})
+				.attr('cy', (d) => {
+					return y(d.life_exp);
+				})
+				.attr('r', (d) => {
+					return rScale(d.population);
+				})
 	}
 }
 

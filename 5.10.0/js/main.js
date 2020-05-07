@@ -62,6 +62,35 @@ if (!document.getElementsByTagName('svg').length) {
 		.attr('transform', 'rotate(-90)')
 		.text('years')
 
+	// Color scale
+	var colorScheme = ['#75eab6', '#feafda', '#c6f25e', '#91cef4'];
+	var colorScale = d3.scaleOrdinal().range(colorScheme);
+
+	let continents = ['europe', 'africa', 'americas', 'asia'];
+
+	let legend = g.append('g')
+		.attr('transform', 'translate(' + (width - 15) + ',' + (height - 250) + ')')
+
+	continents.forEach((continent, i) => {
+		var legendRow = legend.append('g')
+			.attr('transform', 'translate(0, ' + (i * 30) + ')');
+
+		legendRow.append('rect')
+			.attr('fill', colorScale(continent))
+			.attr('width', 15)
+			.attr('height', 15)
+
+		legendRow.append('text')
+			.attr('x', -10)
+			.attr('y', 10)
+			.attr('fill', '#aabad4')
+			.attr('text-anchor', 'end')
+			.style('text-transform', 'capitalize')
+			.attr('font-size', '14px')
+			.text(continent)
+	})
+
+
 	d3.json('data/data.json')
 		.then((data) => {
 			let countriesByYear = data.map((countryArray) => {
@@ -176,10 +205,6 @@ if (!document.getElementsByTagName('svg').length) {
 	update = (countriesByYear, index) => {
 		let data = countriesByYear[index].countries;
 		let years = countriesByYear[index].years;
-
-		// Color scale
-		var colorScheme = ['#75eab6', '#feafda', '#c6f25e', '#91cef4'];
-		var colorScale = d3.scaleOrdinal().range(colorScheme);
 
 		// Create an array for the populations only to use for max value count
 		let populationArray = [];

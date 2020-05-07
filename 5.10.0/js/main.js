@@ -22,7 +22,9 @@ if (!document.getElementsByTagName('svg').length) {
 		.append('g')
 		.attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
 
-	var time = 0;
+	var index = 0;
+	var interval;
+	var countriesByYear;
 
 	// Tooltip
 	var tip = d3.tip().attr('class', 'd3-tip')
@@ -150,7 +152,7 @@ if (!document.getElementsByTagName('svg').length) {
 
 	d3.json('data/data.json')
 		.then((data) => {
-			let countriesByYear = data.map((countryArray) => {
+			countriesByYear = data.map((countryArray) => {
 				return countryArray;
 			});
 
@@ -182,27 +184,70 @@ if (!document.getElementsByTagName('svg').length) {
 
 			countriesByYear = getCountryData;
 
-			// Index for each animation
-			var index = 0;
+			// // Index for each animation
+			// var index = 0;
 
-			var interval = d3.interval(() => {
-				// Restart animation at the end of loop
-				index = (index < 214) ? index + 1 : 0
-				update(countriesByYear, index);
-			}, 100);
+			// var interval = d3.interval(() => {
+			// 	// Restart animation at the end of loop
+			// 	index = (index < 214) ? index + 1 : 0
+			// 	update(countriesByYear, index);
+			// }, 100);
 
-			// Run the vis for the first time
-			update(countriesByYear, index);
+			// // Run the vis for the first time
+			// update(countriesByYear, index);
 		})
 		// Catch if data is not loaded
 		.catch((error) => {
 			console.log(error);
 		});
 
+	// Play and pause animation
+	$("#play-button")
+		.on("click", function(){
+			var button = $(this);
+			if (button.text() == "Play") {
+				button.text("Pause");
+				interval = setInterval(step, 100)
+			}
+			else {
+				button.text("Play");
+				clearInterval(interval);
+			}
+		})
+
+	// Reset animation
+	$('#reset-button')
+		.on('click', function() {
+			index = 0;
+			update(countriesByYear, 0);
+		})
+
+	// Listen to change selection
+	$('#continent-select')
+		.on('change',() => {
+			update(countriesByYear, index)
+		} )
+
+	step = () => {
+		// Loop for the interval
+		index = (index < 214) ? index + 1 : 0
+		update(countriesByYear, index)
+	}
+
 	// Update pattern
 	update = (countriesByYear, index) => {
 		let data = countriesByYear[index].countries;
 		let years = countriesByYear[index].years;
+
+		// Filter visualization by selected continent
+		var continent = $("#continent-select").val();
+
+		data = data.filter((d) => {
+			if (continent === "all") { return true; }
+			else {
+				return d.continent === continent;
+			}
+		})
 
 		// Create an array for the populations only to use for max value count
 		let populationArray = [];

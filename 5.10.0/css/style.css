@@ -17,3 +17,6 @@ body {
 	font: 10px sans-serif;
 }
   
+#play-button, #reset-button {
+	background-color: #aabad4;
+}

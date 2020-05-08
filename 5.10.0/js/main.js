@@ -216,6 +216,17 @@ if (!document.getElementsByTagName('svg').length) {
 			update(countriesByYear, index)
 		} )
 
+	// Add a slider selector for years
+	$("#date-slider").slider({
+		max: 2014,
+		min: 1800,
+		step: 1,
+		slide: function(event, ui) {
+			index = ui.value - 1800;
+			update(countriesByYear, index)
+		}
+	})
+
 	step = () => {
 		// Loop for the interval
 		index = (index < 214) ? index + 1 : 0
@@ -309,6 +320,13 @@ if (!document.getElementsByTagName('svg').length) {
 			.attr('r', (d) => {
 				return rScale(d.population);
 			})
+			
+		
+    // Update the time label
+    yearsLabel.text(+(index + 1800))
+    $("#year")[0].innerHTML = +(index + 1800)
+
+    $("#date-slider").slider("value", +(index + 1800))
 	}
 }
 

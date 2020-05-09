@@ -10,3 +10,5 @@ Project activities created after starting a masteringd3js and data visualization
 ### npm start
 
 This will run a webpack-dev-server and project wll be running at http://localhost:8080/
+
+![](gapminder.gif)

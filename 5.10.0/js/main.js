@@ -22,6 +22,54 @@ if (!document.getElementsByTagName('svg').length) {
 		.append('g')
 		.attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
 
+	// X and x scale
+	const x = d3
+		.scaleLog()
+		.domain([300, 150000])
+		.range([0, width])
+
+	const y = d3
+		.scaleLinear()
+		.domain([0, 90])
+		.range([height, 0])
+
+	// Color scale
+	var colorScheme = ['#75eab6', '#feafda', '#c6f25e', '#91cef4'];
+	var colorScale = d3.scaleOrdinal().range(colorScheme);
+
+	// Define x and y axis
+	const xAxis = g
+		.append('g')
+		.attr('class', 'x axis')
+		.attr('fill', '#274c56')
+		.attr('transform', 'translate(0, ' + height + ')');
+
+	const yAxis = g
+		.append('g')
+		.attr('class', 'y axis')
+		.attr('fill', '#274c56')
+
+	const xAxisCall = d3.axisBottom(x)
+		.tickValues([400, 4000, 40000])
+		.tickFormat(function (d) {
+			return d;
+		});
+
+	xAxis.call(xAxisCall)
+		.selectAll('text')
+		.attr('y', '10')
+		.attr('x', '-5')
+		.attr('text-anchor', 'end')
+		.attr('transform', 'rotate(-40)');
+
+	const yAxisCall = d3.axisLeft(y)
+		.ticks(9)
+		.tickFormat((d) => {
+			return d;
+		});
+
+	yAxis.call(yAxisCall);
+
 	var index = 0;
 	var interval;
 	var countriesByYear;
@@ -78,54 +126,7 @@ if (!document.getElementsByTagName('svg').length) {
 		.attr('transform', 'rotate(-90)')
 		.text('years')
 
-	// x and y scale
-	const x = d3
-		.scaleLog()
-		.domain([300, 150000])
-		.range([0, width])
-
-	const y = d3
-		.scaleLinear()
-		.domain([0, 90])
-		.range([height, 0])
-
-	// Color scale
-	var colorScheme = ['#75eab6', '#feafda', '#c6f25e', '#91cef4'];
-	var colorScale = d3.scaleOrdinal().range(colorScheme);
-
-	// Define x and y axis
-	const xAxis = g
-		.append('g')
-		.attr('class', 'x axis')
-		.attr('fill', '#274c56')
-		.attr('transform', 'translate(0, ' + height + ')');
-
-	const yAxis = g
-		.append('g')
-		.attr('class', 'y axis')
-		.attr('fill', '#274c56')
-
-	const xAxisCall = d3.axisBottom(x)
-		.tickValues([400, 4000, 40000])
-		.tickFormat(function (d) {
-			return d;
-		});
-
-	xAxis.call(xAxisCall)
-		.selectAll('text')
-		.attr('y', '10')
-		.attr('x', '-5')
-		.attr('text-anchor', 'end')
-		.attr('transform', 'rotate(-40)');
-
-	const yAxisCall = d3.axisLeft(y)
-		.ticks(9)
-		.tickFormat((d) => {
-			return d;
-		});
-
-	yAxis.call(yAxisCall);
-
+	// Add legend for each continet with corresponding color
 	let continents = ['europe', 'africa', 'americas', 'asia'];
 
 	let legend = g.append('g')
@@ -191,7 +192,7 @@ if (!document.getElementsByTagName('svg').length) {
 
 	// Play and pause animation
 	$("#play-button")
-		.on("click", function(){
+		.on("click", function () {
 			var button = $(this);
 			if (button.text() == "Play") {
 				button.text("Pause");
@@ -205,23 +206,23 @@ if (!document.getElementsByTagName('svg').length) {
 
 	// Reset animation
 	$('#reset-button')
-		.on('click', function() {
+		.on('click', function () {
 			index = 0;
 			update(countriesByYear, 0);
 		})
 
 	// Listen to change selection
 	$('#continent-select')
-		.on('change',() => {
+		.on('change', () => {
 			update(countriesByYear, index)
-		} )
+		})
 
 	// Add a slider selector for years
 	$("#date-slider").slider({
 		max: 2014,
 		min: 1800,
 		step: 1,
-		slide: function(event, ui) {
+		slide: function (event, ui) {
 			index = ui.value - 1800;
 			update(countriesByYear, index)
 		}
@@ -320,13 +321,12 @@ if (!document.getElementsByTagName('svg').length) {
 			.attr('r', (d) => {
 				return rScale(d.population);
 			})
-			
-		
-    // Update the time label
-    yearsLabel.text(+(index + 1800))
-    $("#year")[0].innerHTML = +(index + 1800)
 
-    $("#date-slider").slider("value", +(index + 1800))
+		// Update the time label
+		yearsLabel.text(+(index + 1800))
+		$("#year")[0].innerHTML = +(index + 1800)
+
+		$("#date-slider").slider("value", +(index + 1800))
 	}
 }
 

@@ -1,4 +1,4 @@
-## Mastering data visualization in D3.js
+## Mastering data visualization in D3.js :seedling:
 
 Project activities created after starting a masteringd3js and data visualization course.
 
@@ -11,4 +11,5 @@ Project activities created after starting a masteringd3js and data visualization
 
 This will run a webpack-dev-server and project wll be running at http://localhost:8080/
 
+You can find the code for my gapminder visualization in the 5.10.0 folder.
 ![gapminder visualization project](gapminder.gif)

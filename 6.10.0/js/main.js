@@ -12,31 +12,31 @@ if (!document.getElementsByTagName('svg').length) {
     // Svg dimension creation ___________________/
     /********************************************/
 
-    var margin = { left: 120, right: 100, top: 50, bottom: 100 },
+    const margin = { left: 120, right: 100, top: 50, bottom: 100 },
         height = 500 - margin.top - margin.bottom,
         width = 800 - margin.left - margin.right;
 
-    var svg = d3.select("#chart-area").append("svg")
+    const svg = d3.select("#chart-area").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom);
 
-    var g = svg.append("g")
+    const g = svg.append("g")
         .attr("transform", "translate(" + margin.left +
             ", " + margin.top + ")");
 
     // Time parser for x-scale
-    var parseTime = d3.timeParse("%d/%m/%Y");
-    var formatTime = d3.timeFormat("%d/%m/%Y");
+    const parseTime = d3.timeParse("%d/%m/%Y");
+    const formatTime = d3.timeFormat("%d/%m/%Y");
 
     // For tooltip
-    var bisectDate = d3.bisector((d) => { return d.year; }).left;
+    const bisectDate = d3.bisector((d) => { return d.year; }).left;
 
     // Set the ranges
-    var x = d3.scaleTime().range([0, width]);
-    var y = d3.scaleLinear().range([height, 0]);
+    const x = d3.scaleTime().range([0, width]);
+    const y = d3.scaleLinear().range([height, 0]);
 
     // Create a transition duration variable
-    const t = d3.transition().duration(100);
+    const t = () => { return d3.transition().duration(1000); }
 
     g.append("path")
         .attr("class", "line")
@@ -45,16 +45,16 @@ if (!document.getElementsByTagName('svg').length) {
         .attr("stroke-width", "1px")
 
     // Axis generators
-    var xAxisCall = d3.axisBottom()
-    var yAxisCall = d3.axisLeft()
+    const xAxisCall = d3.axisBottom()
+    const yAxisCall = d3.axisLeft()
         .ticks(6)
         .tickFormat((d) => { return parseInt(d / 1000) + "k"; });
 
     // Axis groups
-    var xAxis = g.append("g")
+    const xAxis = g.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")");
-    var yAxis = g.append("g")
+        const yAxis = g.append("g")
         .attr("class", "y axis")
 
     // Y-Axis label
@@ -76,9 +76,7 @@ if (!document.getElementsByTagName('svg').length) {
         .text("Time");
 
     // Initialize variables
-    var coinsArray;
-    var coinsData;
-    var bitcoinValues;
+    let coinsData;
 
     // Event listeners
     d3.select("#coin-select").on("change", update)
@@ -86,8 +84,8 @@ if (!document.getElementsByTagName('svg').length) {
 
 
     // Add a slider selector for dates
-    var minDate = parseTime("31/5/2013").getTime();
-    var maxDate = parseTime("12/10/2017").getTime();
+    const minDate = parseTime("31/5/2013").getTime();
+    const maxDate = parseTime("12/10/2017").getTime();
 
     $("#date-slider").slider({
         range: true,
@@ -96,8 +94,8 @@ if (!document.getElementsByTagName('svg').length) {
         step: 60 * 60 * 24 * 1000, // 1 day
         values: [minDate, maxDate],
         slide: function (event, ui) {
-            var startDate = new Date(ui.values[0]);
-            var endDate = new Date(ui.values[1]);
+            const startDate = new Date(ui.values[0]);
+            const endDate = new Date(ui.values[1]);
             $('#dateLabel1').text(formatTime(startDate));
             $('#dateLabel2').text(formatTime(endDate));
             update();
@@ -111,7 +109,7 @@ if (!document.getElementsByTagName('svg').length) {
     // Load data
     d3.json("data/coins.json").then((data) => {
         // Data cleaning
-        coinsArray = Object.entries(data);
+        const coinsArray = Object.entries(data);
         coinsData = {};
         for (const [key] of coinsArray) {
             coinsData[key] = data[key].filter((d) => {
@@ -134,28 +132,41 @@ if (!document.getElementsByTagName('svg').length) {
 
     function update() {
         // Filter visualization by selected data
-        var coin = $("#coin-select").val();
-        var yVal = $("#var-select").val();
-        var sliderValues = $("#date-slider").slider("values");
+        const coin = $("#coin-select").val();
+        const yVal = $("#var-select").val();
+        const sliderValues = $("#date-slider").slider("values");
 
         // Return selected data
-        var dataSelected = coinsData[coin].filter(function (d) {
+        const dataSelected = coinsData[coin].filter(function (d) {
             return ((d.date >= sliderValues[0]) && (d.date <= sliderValues[1]))
         });
 
         // Line path generator
-        var line = d3.line()
+        const line = d3.line()
             .x((d) => { return x(d.date); })
             .y((d) => { return y(d[yVal]); });
 
-        // Set scale domains
+        // Updates scale domains
         x.domain(d3.extent(dataSelected, (d) => { return d.date; }));
         y.domain([d3.min(dataSelected, (d) => { return d[yVal]; }) / 1.005,
         d3.max(dataSelected, (d) => { return d[yVal]; }) * 1.005]);
 
-        // Generate axes once scales have been set
-        xAxis.transition(t).call(xAxisCall.scale(x))
-        yAxis.transition(t).call(yAxisCall.scale(y))
+        // Fix for format values
+        const formatSi = d3.format(".2s");
+        formatAbbreviation = (x) => {
+            var s = formatSi(x);
+            switch (s[s.length - 1]) {
+                case "G": return s.slice(0, -1) + "B";
+                case "k": return s.slice(0, -1) + "K";
+            }
+            return s;
+        }
+
+        // Update axes once scales have been set
+        xAxisCall.scale(x);
+        xAxis.transition(t()).call(xAxisCall);
+        yAxisCall.scale(y);
+        yAxis.transition(t()).call(yAxisCall.tickFormat(formatAbbreviation));
 
         // Draw the path using the selected data
         g.select(".line")

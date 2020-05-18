@@ -12,7 +12,7 @@ if (!document.getElementsByTagName('svg').length) {
     // Svg dimension creation ___________________/
     /********************************************/
 
-    var margin = { left: 80, right: 100, top: 50, bottom: 100 },
+    var margin = { left: 120, right: 100, top: 50, bottom: 100 },
         height = 500 - margin.top - margin.bottom,
         width = 800 - margin.left - margin.right;
 
@@ -61,11 +61,10 @@ if (!document.getElementsByTagName('svg').length) {
     yAxis.append("text")
         .attr("class", "axis-title")
         .attr("transform", "rotate(-90)")
-        .attr("y", -40)
+        .attr("y", -80)
         .attr('x', -(height / 2) + 30)
         .style("text-anchor", "end")
         .attr("fill", "#5D6971")
-        .text("Price(USD)");
 
     // X-Axis label
     xAxis.append("text")
@@ -84,6 +83,26 @@ if (!document.getElementsByTagName('svg').length) {
     // Event listeners
     d3.select("#coin-select").on("change", update)
     d3.select("#var-select").on("change", update)
+
+
+    // Add a slider selector for dates
+    var minDate = parseTime("31/5/2013").getTime();
+    var maxDate = parseTime("12/10/2017").getTime();
+
+    $("#date-slider").slider({
+        range: true,
+        min: minDate,
+        max: maxDate,
+        step: 60 * 60 * 24 * 1000, // 1 day
+        values: [minDate, maxDate],
+        slide: function (event, ui) {
+            var startDate = new Date(ui.values[0]);
+            var endDate = new Date(ui.values[1]);
+            $('#dateLabel1').text(formatTime(startDate));
+            $('#dateLabel2').text(formatTime(endDate));
+            update();
+        }
+    })
 
     /********************************************/
     // Data part ________________________________/
@@ -117,10 +136,11 @@ if (!document.getElementsByTagName('svg').length) {
         // Filter visualization by selected data
         var coin = $("#coin-select").val();
         var yVal = $("#var-select").val();
+        var sliderValues = $("#date-slider").slider("values");
 
         // Return selected data
         var dataSelected = coinsData[coin].filter(function (d) {
-            return d;
+            return ((d.date >= sliderValues[0]) && (d.date <= sliderValues[1]))
         });
 
         // Line path generator
@@ -141,5 +161,9 @@ if (!document.getElementsByTagName('svg').length) {
         g.select(".line")
             .transition(t)
             .attr("d", line(dataSelected));
+
+        // Change Y label after selecting the Y value
+        yAxis.select("text")
+            .text(yVal);
     }
 }

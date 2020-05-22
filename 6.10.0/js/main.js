@@ -29,7 +29,7 @@ if (!document.getElementsByTagName('svg').length) {
     const formatTime = d3.timeFormat("%d/%m/%Y");
 
     // For tooltip
-    const bisectDate = d3.bisector((d) => { return d.year; }).left;
+    const bisectDate = d3.bisector((d) => { return d.date; }).left;
 
     // Set the ranges
     const x = d3.scaleTime().range([0, width]);
@@ -54,11 +54,11 @@ if (!document.getElementsByTagName('svg').length) {
     const xAxis = g.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")");
-        const yAxis = g.append("g")
+    const yAxis = g.append("g")
         .attr("class", "y axis")
 
     // Y-Axis label
-    yAxis.append("text")
+    const yLabel = yAxis.append("text")
         .attr("class", "axis-title")
         .attr("transform", "rotate(-90)")
         .attr("y", -80)
@@ -168,13 +168,56 @@ if (!document.getElementsByTagName('svg').length) {
         yAxisCall.scale(y);
         yAxis.transition(t()).call(yAxisCall.tickFormat(formatAbbreviation));
 
-        // Draw the path using the selected data
+        // Clear old tooltips
+        d3.select(".focus").remove();
+        d3.select(".overlay").remove();
+
+        // Tooltip code
+        var focus = g.append("g")
+            .attr("class", "focus")
+            .style("display", "none");
+        focus.append("line")
+            .attr("class", "x-hover-line hover-line")
+            .attr("y1", 0)
+            .attr("y2", height);
+        focus.append("line")
+            .attr("class", "y-hover-line hover-line")
+            .attr("x1", 0)
+            .attr("x2", width);
+        focus.append("circle")
+            .attr("r", 5);
+        focus.append("text")
+            .attr("x", 15)
+            .attr("dy", ".31em");
+        svg.append("rect")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+            .attr("class", "overlay")
+            .attr("width", width)
+            .attr("height", height)
+            .on("mouseover", () => { focus.style("display", null); })
+            .on("mouseout", () => { focus.style("display", "none"); })
+            .on("mousemove", mousemove);
+
+        function mousemove() {
+            var x0 = x.invert(d3.mouse(this)[0]),
+                i = bisectDate(dataSelected, x0, 1),
+                d0 = dataSelected[i - 1],
+                d1 = dataSelected[i],
+                d = (d1 && d0) ? (x0 - d0.date > d1.date - x0 ? d1 : d0) : 0;
+            focus.attr("transform", "translate(" + x(d.date) + "," + y(d[yVal]) + ")");
+            focus.select("text").text(() => { return d3.format("$,")(d[yVal].toFixed(2)); });
+            focus.select(".x-hover-line").attr("y2", height - y(d[yVal]));
+            focus.select(".y-hover-line").attr("x2", -x(d.date));
+        }
+
+        // Update the path using the selected data
         g.select(".line")
             .transition(t)
             .attr("d", line(dataSelected));
 
         // Change Y label after selecting the Y value
-        yAxis.select("text")
-            .text(yVal);
+        const newText = (yVal == "price_usd") ? "Price (USD)" :
+            ((yVal == "market_cap") ? "Market Capitalization (USD)" : "24 Hour Trading Volume (USD)")
+        yLabel.text(newText);
     }
 }

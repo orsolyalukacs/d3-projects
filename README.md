@@ -1,17 +1,14 @@
 ## Mastering data visualization in D3.js :earth_africa:
 
-Project activities created after starting a masteringd3js and data visualization course.
+Project activities created during studying mastering d3.js and data visualization.
 
 ## How to start the projects:
 
-### cd into a folder 
-```cd 3.13.0```
+### cd into a folder
+```cd 3.13.0``` (for example)
 ### npm install
 ### npm start
 
-This will run a webpack-dev-server and project wll be running at http://localhost:8080/
+This will run a webpack-dev-server and project will be running at http://localhost:8080/
 
-
-:globe_with_meridians: You can find the code for my gapminder visualization in the 5.10.0 folder.
-
-![gapminder visualization project](gapminder.gif)
+Please find more information about each activity in their correspondent folders.

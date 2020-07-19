@@ -1,6 +1,6 @@
 ## Mastering data visualization in D3.js :earth_africa:
 
-Project activities created during and after a Data Visualization course.
+Project activities created during studying a Data Visualization course.
 
 ## How to start the projects:
 

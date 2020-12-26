@@ -20,11 +20,11 @@ $("#var-select").on("change", updateCharts)
 
 
 d3.json("data/calls.json").then(data => {
-	// Create a new data object based on the selected value
+	// Data operations
 	data.forEach((d) => {
-		d.call_revenue = Number(d.call_revenue) / 100000
-		d.call_duration = Number(d.call_duration) / 100000
-		d.units_sold = Number(d.units_sold) / 100000
+		d.call_revenue = Number(d.call_revenue)
+		d.call_duration = Number(d.call_duration)
+		d.units_sold = Number(d.units_sold)
 		d.date = parseDate(d.date)
 	});
 

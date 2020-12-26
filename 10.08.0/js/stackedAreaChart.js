@@ -25,7 +25,7 @@ class StackedAreaChart {
     vis.height = vis.svg.attr("height") - vis.margin.top - vis.margin.bottom;
 
     vis.g = vis.svg.append("g")
-      .attr("transform", "translate(" + vis.margin.left + "," + vis.margin.top + ")");
+      .attr("transform", "translate(" + vis.margin.left + "," + (vis.margin.top + 10) + ")");
 
     vis.color = d3.scaleOrdinal(d3.schemeSet3)
 
@@ -42,7 +42,6 @@ class StackedAreaChart {
     vis.yAxis = vis.g.append("g")
       .attr("class", "y axis")
 
-
     vis.keys = ["midwest", "northeast", "south", "west"]
 
     vis.stack = d3.stack().keys(vis.keys);
@@ -52,16 +51,19 @@ class StackedAreaChart {
       .y0(d => vis.y(d[0]))
       .y1(d => vis.y(d[1]));
 
+    vis.addLegend();
     vis.wrangleData();
   }
 
   wrangleData() {
     const vis = this
+
     vis.selectedVal = $("#var-select").val()
     vis.groupedByDate = d3.nest()
       .key(d => formatDate(d.date))
       .entries(calls)
 
+    // Create a new data object based on the selected value
     vis.filteredData = vis.groupedByDate
       .map(day => day.values.reduce(
         (data, teams) => {
@@ -81,7 +83,6 @@ class StackedAreaChart {
 
   updateVis() {
     const vis = this;
-    // data join, appending one of these layers for each of the items in the array
 
     vis.t = d3.transition().duration(500)
 
@@ -93,14 +94,13 @@ class StackedAreaChart {
     vis.x.domain(d3.extent(vis.filteredData, (d) => parseDate(d.date)));
     vis.y.domain([0, vis.maxDateVal]);
 
-    // update axes
+    // Update axes
     vis.xAxisCall.scale(vis.x)
     vis.xAxis.transition(vis.t).call(vis.xAxisCall)
     vis.yAxisCall.scale(vis.y)
     vis.yAxis.transition(vis.t).call(vis.yAxisCall)
 
-    //transition area
-
+    // Data join, appending one of these layers for each of the items in the array
     vis.teams = vis.g.selectAll(".team")
       .data(vis.stack(vis.filteredData))
 
@@ -115,9 +115,32 @@ class StackedAreaChart {
       .style("fill", d => vis.color(d.key))
       .style("fill-opacity", 0.8)
   }
-  //TODO: adds text labels to the chart and call it in initVis
+
+  //Adds text labels and legend to the chart
   addLegend() {
+    const vis = this;
+    const size = 20;
 
+    vis.g.selectAll("legend")
+      .data(vis.keys)
+      .enter()
+      .append("rect")
+      .attr("x", (d, i) => 20 + i * (size * 6))
+      .attr("y", -30 )
+      .attr("width", 20)
+      .attr("height", 20)
+      .style("fill", (d) => vis.color(d))
+      .text()
+
+    vis.g.selectAll("labels")
+      .data(vis.keys)
+      .enter()
+      .append("text")
+      .attr("x", (d, i) => 20 + i * (size * 6) + size + (size / 2))
+      .attr("y", -30 + size / 2)
+      .style("fill", "black")
+      .text((d) => d )
+      .attr("text-anchor", "left")
+      .style("alignment-baseline", "middle")
   }
-
 }

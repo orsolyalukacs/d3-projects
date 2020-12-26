@@ -54,3 +54,7 @@ stroke-dasharray: 3,3;
 padding-top: 10px;
 padding-bottom: 10px;
 }
+
+#stacked-area {
+  padding-top: 20px;
+}

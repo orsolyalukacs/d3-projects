@@ -18,19 +18,19 @@ class StackedAreaChart {
 
     vis.svg = d3.select(vis.parentElement)
       .append("svg");
-    vis.svg.attr("width", 600)
+    vis.svg.attr("width", 800)
       .attr("height", 600)
-    vis.margin = { top: 20, right: 20, bottom: 30, left: 50 };
-    vis.width = vis.svg.attr("width") - vis.margin.left - vis.margin.right;
-    vis.height = vis.svg.attr("height") - vis.margin.top - vis.margin.bottom;
+    vis.MARGIN = { LEFT: 50, RIGHT: 100, TOP: 20, BOTTOM: 30 };
+    vis.WIDTH = vis.svg.attr("width") - vis.MARGIN.LEFT - vis.MARGIN.RIGHT;
+    vis.HEIGHT = vis.svg.attr("height") - vis.MARGIN.TOP - vis.MARGIN.BOTTOM;
 
     vis.g = vis.svg.append("g")
-      .attr("transform", "translate(" + vis.margin.left + "," + (vis.margin.top + 10) + ")");
+      .attr("transform", "translate(" + vis.MARGIN.LEFT + "," + (vis.MARGIN.TOP + 10) + ")");
 
     vis.color = d3.scaleOrdinal(d3.schemeSet3)
 
-    vis.x = d3.scaleTime().range([0, vis.width]);
-    vis.y = d3.scaleLinear().range([vis.height, 0]);
+    vis.x = d3.scaleTime().range([0, vis.WIDTH]);
+    vis.y = d3.scaleLinear().range([vis.HEIGHT, 0]);
     vis.z = d3.scaleOrdinal(d3.schemeSet3)
 
     vis.yAxisCall = d3.axisLeft()
@@ -38,7 +38,7 @@ class StackedAreaChart {
       .ticks(4)
     vis.xAxis = vis.g.append("g")
       .attr("class", "x axis")
-      .attr("transform", `translate(0, ${vis.height})`)
+      .attr("transform", `translate(0, ${vis.HEIGHT})`)
     vis.yAxis = vis.g.append("g")
       .attr("class", "y axis")
 

@@ -205,7 +205,7 @@ if (!document.getElementsByTagName('svg').length) {
                 d1 = dataSelected[i],
                 d = (d1 && d0) ? (x0 - d0.date > d1.date - x0 ? d1 : d0) : 0;
             focus.attr("transform", "translate(" + x(d.date) + "," + y(d[yVal]) + ")");
-            focus.select("text").text(() => { return d3.format("$,")(d[yVal].toFixed(2)); });
+            focus.select("text").text(() => { return d3.format("$,")(d[yVal] ? d[yVal].toFixed(2) : ""); });
             focus.select(".x-hover-line").attr("y2", height - y(d[yVal]));
             focus.select(".y-hover-line").attr("x2", -x(d.date));
         }

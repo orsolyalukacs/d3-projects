@@ -12,6 +12,7 @@ let stackedAreaChart
 let barChart1
 let barChart2
 let barChart3
+let donutChart
 let calls
 let allCalls
 let groupedData = {}
@@ -43,6 +44,7 @@ d3.json("data/calls.json").then(data => {
 	barChart1 = new BarChart("#units-sold", "units_sold", "Units sold per call")
 	barChart2 = new BarChart("#revenue", "call_revenue", "Average call revenue (USD)")
 	barChart3 = new BarChart("#call-duration", "call_duration", "Average call duration (seconds)")
+	donutChart = new DonutChart("#company-size")
 })
 
 function updateCharts() {
@@ -69,4 +71,9 @@ function changeTimePeriod(values) {
 	$("#dateLabel2").text(formatDate(values[1]))
 
 	stackedAreaChart.wrangleData() // sorts out which dates to show based on the values selected by the brush
+
+	barChart1.wrangleData()
+	barChart2.wrangleData()
+	barChart3.wrangleData()
+	donutChart.wrangleData()
 }

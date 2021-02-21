@@ -4,7 +4,6 @@
 *    Project 4 - Jazzle Dashboard
 */
 
-// TODO: display the category that the sale fell into, by company size: small, medium, large
 class DonutChart {
   constructor(_parentElement, _variable) {
     this.parentElement = _parentElement
@@ -16,9 +15,9 @@ class DonutChart {
   initVis() {
     const vis = this
 
-    vis.MARGIN = { LEFT: 0, RIGHT: 0, TOP: 40, BOTTOM: 0 }
-    vis.WIDTH = 250 - vis.MARGIN.LEFT - vis.MARGIN.RIGHT
-    vis.HEIGHT = 250 - vis.MARGIN.TOP - vis.MARGIN.BOTTOM
+    vis.MARGIN = { LEFT: 40, RIGHT: 100, TOP: 40, BOTTOM: 10 }
+    vis.WIDTH = 350 - vis.MARGIN.LEFT - vis.MARGIN.RIGHT
+    vis.HEIGHT = 140 - vis.MARGIN.TOP - vis.MARGIN.BOTTOM
     vis.RADIUS = Math.min(vis.WIDTH, vis.HEIGHT) / 2
 
     vis.svg = d3.select(vis.parentElement).append("svg")
@@ -35,12 +34,12 @@ class DonutChart {
       .sort(null)
 
     vis.arc = d3.arc()
-      .innerRadius(vis.RADIUS - 60)
-      .outerRadius(vis.RADIUS - 30)
+      .innerRadius(vis.RADIUS - 15)
+      .outerRadius(vis.RADIUS)
 
     vis.g.append("text")
-      .attr("y", -(vis.HEIGHT / 2))
-      .attr("x", -(vis.WIDTH / 2))
+      .attr("y", -60)
+      .attr("x", -140)
       .attr("font-size", "12px")
       .attr("text-anchor", "start")
       .text("Company size")
@@ -66,8 +65,6 @@ class DonutChart {
         count: size.values.length
       }
     })
-
-    console.log(groupedBySize)
 
     vis.updateVis()
   }
@@ -98,6 +95,34 @@ class DonutChart {
   }
 
   addLegend() {
-    // TODO: add legend
+    const vis = this
+
+    const legend = vis.g.append("g").attr("transform", "translate(150, -30)")
+
+    const legendText = [
+      { label: 'small', color: vis.color('small') },
+      { label: 'medium', color: vis.color('medium') },
+      { label: 'large', color: vis.color('large') }
+    ]
+
+    const legendRow = legend.selectAll('.legendRow')
+      .data(legendText)
+      .enter().append('g')
+      .attr('class', 'legendRow')
+      .attr('transform', (d, i) => `translate(0, ${i * 20})`)
+
+    legendRow.append('rect')
+      .attr('class', 'legendbox')
+      .attr('width', 10)
+      .attr('height', 10)
+      .attr('fill', d => d.color)
+
+    legendRow.append('text')
+      .attr('class', 'legendText')
+      .attr('x', -10)
+      .attr('y', 10)
+      .attr('text-anchor', 'end')
+      .text(d => d.label)
+
   }
 }

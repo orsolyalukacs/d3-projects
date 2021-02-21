@@ -123,9 +123,9 @@ class BarChart {
       .attr("width", vis.x.bandwidth())
       .attr("height", (d) => vis.HEIGHT - vis.y(d.size))
       .attr("fill", function (d) { return accent(d.category); });
-    //   .attr("fill", function(d) {
-    //     console.log(vis.y(d.size))
-    //     return "rgb(0, 0, " + (- vis.y(d.size * 10)) + ")";
-    // });
+      //   .attr("fill", function(d) {
+      //     console.log(vis.y(d.size))
+      //     return "rgb(0, 0, " + (- vis.y(d.size * 10)) + ")";
+      // });
   }
 }
